@@ -1,6 +1,6 @@
 [
   {
     "name": "app",
-    "imageUri": "placeholder"
+    "imageUri": "116129308524.dkr.ecr.ap-south-1.amazonaws.com/aws-demo-repo:latest"
   }
 ]
