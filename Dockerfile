@@ -1,5 +1,5 @@
 # Use Node base image
-FROM node:18
+FROM public.ecr.aws/docker/library/node:18
 
 # Set working directory
 WORKDIR /app
