@@ -9,18 +9,29 @@ phases:
 
   pre_build:
     commands:
+      - echo "Getting AWS Account ID..."
       - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
+      - echo "Logging into ECR..."
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
   build:
     commands:
+      - echo "Build started on $(date)"
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+
+      - echo "Building Docker image..."
       - docker build -t $REPO_NAME:$IMAGE_TAG .
+
+      - echo "Tagging Docker image..."
       - docker tag $REPO_NAME:$IMAGE_TAG $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG
 
   post_build:
     commands:
+      - echo "Pushing image to ECR..."
       - docker push $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+
+      - echo "Creating imagedefinitions.json..."
       - printf '[{"name":"app","imageUri":"%s"}]' $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG > imagedefinitions.json
 
 artifacts:
